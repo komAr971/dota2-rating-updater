@@ -24,9 +24,6 @@ export default async () => {
     const mappedMatches = matches.map(mapper);
     lastMatchId = matches[matches.length - 1].match_id;
     sortedMatches = [...sortedMatches, ...mappedMatches].sort(compareMatches);
-    //console.log(sortedMatches);
-    //console.log('был запрос матчей');
-    //console.log(sortedMatches[0].end_time);
   } while (sortedMatches[0].end_time > lastMatchEndTime);
 
   return sortedMatches.filter((match) => match.end_time > lastMatchEndTime);

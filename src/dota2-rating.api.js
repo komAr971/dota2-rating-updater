@@ -23,4 +23,25 @@ const updateLastMatchEndTime = async (lastMatchEndTime) => {
   });
 };
 
-export { getLastMatchEndTime, updateLastMatchEndTime };
+const getTeams = async () => {
+  const url = new URL('http://localhost:3000/api/teams');
+
+  const response = await fetch(url.toString());
+  return await response.json();
+};
+
+const upsertTeam = async (team) => {
+  const url = new URL('http://localhost:3000/api/teams/');
+
+  const body = JSON.stringify(team);
+  const response = await fetch(url.toString(), {
+    method: 'PUT',
+    body: body,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+  return await response.json();
+};
+
+export { getLastMatchEndTime, updateLastMatchEndTime, getTeams, upsertTeam };
