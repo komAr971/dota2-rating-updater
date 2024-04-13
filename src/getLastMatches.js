@@ -14,17 +14,23 @@ const mapper = (match) => {
 
 export default async () => {
   const lastMatchEndTime = new Date(await getLastMatchEndTime()).getTime() / 1000;
-  console.log(lastMatchEndTime);
 
   let sortedMatches = [];
   let lastMatchId = null;
+  let matches = [];
 
   do {
-    const matches = await getProMatches(lastMatchId);
+    matches = await getProMatches(lastMatchId);
     const mappedMatches = matches.map(mapper);
-    lastMatchId = matches[matches.length - 1].match_id;
+    lastMatchId = matches[matches.length - 1]?.match_id;
+    const lastMatchStartTime = new Date(
+      matches[matches.length - 1]?.start_time * 1000,
+    );
+    console.log(
+      `${lastMatchStartTime.toLocaleString('ru-RU')}, lastMatchId = ${lastMatchId}`,
+    );
     sortedMatches = [...sortedMatches, ...mappedMatches].sort(compareMatches);
-  } while (sortedMatches[0].end_time > lastMatchEndTime);
+  } while (sortedMatches[0].end_time > lastMatchEndTime && matches.length > 0);
 
   return sortedMatches.filter((match) => match.end_time > lastMatchEndTime);
 };

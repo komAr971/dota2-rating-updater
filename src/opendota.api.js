@@ -6,18 +6,29 @@ function sleep(seconds) {
 }
 
 const getProMatches = async (lastMatchId = null) => {
-  const url = new URL('https://api.opendota.com/api/proMatches');
+  try {
+    await sleep(1.1);
 
-  if (lastMatchId) {
-    url.search = `less_than_match_id=${lastMatchId}`;
-  }
+    const url = new URL('https://api.opendota.com/api/proMatches');
 
-  const response = await fetch(url.toString());
-  const data = await response.json();
+    if (lastMatchId) {
+      url.search = `less_than_match_id=${lastMatchId}`;
+    }
 
-  await sleep(1);
-
-  return data;
+    const response = await fetch(url.toString());
+    return await response.json();
+  } catch (error) {}
 };
 
-export { getProMatches };
+const getTeamData = async (teamId) => {
+  try {
+    await sleep(1.1);
+
+    const url = new URL(teamId, 'https://api.opendota.com/api/teams/');
+
+    const response = await fetch(url.toString());
+    return await response.json();
+  } catch (error) {}
+};
+
+export { getProMatches, getTeamData };
