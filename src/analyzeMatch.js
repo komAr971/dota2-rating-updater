@@ -21,6 +21,22 @@ export default (match, teams) => {
     looser.team_id = 416900;
   }
 
+  ///exception for Kaipi
+  if (winner.team_id === 1002030) {
+    winner.team_id = 59;
+  }
+  if (looser.team_id === 1002030) {
+    looser.team_id = 59;
+  }
+
+  ///exception for Team Empire
+  if (winner.team_id === 1110667) {
+    winner.team_id = 46;
+  }
+  if (looser.team_id === 1110667) {
+    looser.team_id = 46;
+  }
+
   const foundWinner = teams.find(({ team_id }) => team_id === winner.team_id);
   const foundLooser = teams.find(({ team_id }) => team_id === looser.team_id);
 
