@@ -44,4 +44,24 @@ const upsertTeam = async (team) => {
   return await response.json();
 };
 
-export { getLastMatchEndTime, updateLastMatchEndTime, getTeams, upsertTeam };
+const addFirstPlace = async (firstPlace) => {
+  const url = new URL('http://localhost:3000/api/firstPlaces');
+
+  const body = JSON.stringify(firstPlace);
+  const response = await fetch(url.toString(), {
+    method: 'POST',
+    body: body,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+  return await response.json();
+};
+
+export {
+  getLastMatchEndTime,
+  updateLastMatchEndTime,
+  getTeams,
+  upsertTeam,
+  addFirstPlace,
+};

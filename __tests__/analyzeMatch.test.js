@@ -13,8 +13,7 @@ test('Add new teams radiand win', () => {
     radiant_win: true,
   };
 
-  const teamsToUpdate = analyzeMatch(match, teams);
-  console.log(teamsToUpdate);
+  const { teamsToUpdate, firstPlace } = analyzeMatch(match, teams);
 
   expect(teamsToUpdate).toEqual([
     {
@@ -30,6 +29,7 @@ test('Add new teams radiand win', () => {
       last_match_time: 1713096904000,
     },
   ]);
+  expect(firstPlace).toBeUndefined();
 });
 
 test('Add new teams dire win', () => {
@@ -44,8 +44,7 @@ test('Add new teams dire win', () => {
     radiant_win: false,
   };
 
-  const teamsToUpdate = analyzeMatch(match, teams);
-  console.log(teamsToUpdate);
+  const { teamsToUpdate, firstPlace } = analyzeMatch(match, teams);
 
   expect(teamsToUpdate).toEqual([
     {
@@ -61,6 +60,7 @@ test('Add new teams dire win', () => {
       last_match_time: 1713096904000,
     },
   ]);
+  expect(firstPlace).toBeUndefined();
 });
 
 test('Update existing teams radiant win', () => {
@@ -86,10 +86,11 @@ test('Update existing teams radiant win', () => {
     dire_team_id: 2,
     dire_name: 'team_2',
     radiant_win: true,
+    leagueid: 30,
+    league_name: 'TI 1',
   };
 
-  const teamsToUpdate = analyzeMatch(match, teams);
-  console.log(teamsToUpdate);
+  const { teamsToUpdate, firstPlace } = analyzeMatch(match, teams);
 
   expect(teamsToUpdate).toEqual([
     {
@@ -105,6 +106,12 @@ test('Update existing teams radiant win', () => {
       last_match_time: 1713096904000,
     },
   ]);
+  expect(firstPlace).toEqual({
+    team_id: 1,
+    match_time: 1713096904000,
+    league_id: 30,
+    league_name: 'TI 1',
+  });
 });
 
 test('Update existing teams dire win', () => {
@@ -130,10 +137,11 @@ test('Update existing teams dire win', () => {
     dire_team_id: 2,
     dire_name: 'team_2',
     radiant_win: false,
+    leagueid: 20,
+    league_name: 'TI 2',
   };
 
-  const teamsToUpdate = analyzeMatch(match, teams);
-  console.log(teamsToUpdate);
+  const { teamsToUpdate, firstPlace } = analyzeMatch(match, teams);
 
   expect(teamsToUpdate).toEqual([
     {
@@ -149,6 +157,12 @@ test('Update existing teams dire win', () => {
       last_match_time: 1713096904000,
     },
   ]);
+  expect(firstPlace).toEqual({
+    team_id: 2,
+    match_time: 1713096904000,
+    league_id: 20,
+    league_name: 'TI 2',
+  });
 });
 
 test('Rating remains the same', () => {
@@ -176,10 +190,10 @@ test('Rating remains the same', () => {
     radiant_win: true,
   };
 
-  const teamsToUpdate = analyzeMatch(match, teams);
-  console.log(teamsToUpdate);
+  const { teamsToUpdate, firstPlace } = analyzeMatch(match, teams);
 
   expect(teamsToUpdate).toEqual([]);
+  expect(firstPlace).toBeUndefined();
 });
 
 test('Lower ranked team wins and other teams fall in ranking', () => {
@@ -211,10 +225,11 @@ test('Lower ranked team wins and other teams fall in ranking', () => {
     dire_team_id: 2,
     dire_name: 'team_2',
     radiant_win: true,
+    leagueid: 40,
+    league_name: 'TI 4',
   };
 
-  const teamsToUpdate = analyzeMatch(match, teams);
-  console.log(teamsToUpdate);
+  const { teamsToUpdate, firstPlace } = analyzeMatch(match, teams);
 
   expect(teamsToUpdate).toEqual([
     {
@@ -236,6 +251,12 @@ test('Lower ranked team wins and other teams fall in ranking', () => {
       last_match_time: 1713096903000,
     },
   ]);
+  expect(firstPlace).toEqual({
+    team_id: 1,
+    match_time: 1713096904000,
+    league_id: 40,
+    league_name: 'TI 4',
+  });
 });
 
 test('Higher ranked team wins and no teams fall in ranking', () => {
@@ -269,8 +290,8 @@ test('Higher ranked team wins and no teams fall in ranking', () => {
     radiant_win: true,
   };
 
-  const teamsToUpdate = analyzeMatch(match, teams);
-  console.log(teamsToUpdate);
+  const { teamsToUpdate, firstPlace } = analyzeMatch(match, teams);
 
   expect(teamsToUpdate).toEqual([]);
+  expect(firstPlace).toBeUndefined();
 });

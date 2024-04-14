@@ -1,4 +1,7 @@
+import { addFirstPlace } from './dota2-rating.api';
+
 export default (match, teams) => {
+  const result = {};
   const teamsToUpdate = [];
 
   const winner = {
@@ -57,6 +60,15 @@ export default (match, teams) => {
     winner.last_match_time = match.start_time * 1000;
     teamsToUpdate.push(winner);
 
+    if (winner.rating_place === 1) {
+      result.firstPlace = {
+        team_id: winner.team_id,
+        match_time: match.start_time * 1000,
+        league_id: match.leagueid,
+        league_name: match.league_name,
+      };
+    }
+
     looser.rating_place = looser.rating_place + 1;
     looser.last_match_time = match.start_time * 1000;
     teamsToUpdate.push(looser);
@@ -71,5 +83,6 @@ export default (match, teams) => {
     }`,
   );
 
-  return teamsToUpdate;
+  result.teamsToUpdate = teamsToUpdate;
+  return result;
 };

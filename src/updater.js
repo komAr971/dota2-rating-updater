@@ -1,4 +1,3 @@
-import fetch from 'node-fetch';
 import getLastMatches from './getLastMatches.js';
 import { getTeams, updateLastMatchEndTime } from './dota2-rating.api.js';
 import analyzeMatch from './analyzeMatch.js';
@@ -9,8 +8,9 @@ const updater = async () => {
 
   for (const match of matches) {
     const teams = await getTeams();
-    const teamsToUpdate = analyzeMatch(match, teams);
+    const { teamsToUpdate, firstPlace } = analyzeMatch(match, teams);
     await updateTeams(teamsToUpdate);
+    await addFirstPlace(firstPlace);
   }
 
   if (matches.length > 0) {
