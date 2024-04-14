@@ -22,13 +22,7 @@ export default async () => {
   do {
     matches = await getProMatches(lastMatchId);
     const mappedMatches = matches.map(mapper);
-    lastMatchId = matches[matches.length - 1]?.match_id;
-    const lastMatchStartTime = new Date(
-      matches[matches.length - 1]?.start_time * 1000,
-    );
-    console.log(
-      `${lastMatchStartTime.toLocaleString('ru-RU')}, lastMatchId = ${lastMatchId}`,
-    );
+    lastMatchId = matches[matches.length - 1].match_id;
     sortedMatches = [...sortedMatches, ...mappedMatches].sort(compareMatches);
   } while (sortedMatches[0].end_time > lastMatchEndTime && matches.length > 0);
 

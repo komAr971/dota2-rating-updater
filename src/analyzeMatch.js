@@ -1,78 +1,75 @@
-import { getTeams, upsertTeam } from './dota2-rating.api.js';
-import { getTeamData } from './opendota.api.js';
+export default (match, teams) => {
+  const teamsToUpdate = [];
 
-export default async (match) => {
-  const radiantWin = match.radiant_win;
-  const winnerTeamId = radiantWin ? match.radiant_team_id : match.dire_team_id;
-  const looserTeamId = radiantWin ? match.dire_team_id : match.radiant_team_id;
+  const winner = {
+    team_id: match.radiant_win ? match.radiant_team_id : match.dire_team_id,
+    name: match.radiant_win ? match.radiant_name : match.dire_name,
+    last_match_time: match.start_time * 1000,
+  };
+  const looser = {
+    team_id: match.radiant_win ? match.dire_team_id : match.radiant_team_id,
+    name: match.radiant_win ? match.dire_name : match.radiant_name,
+    last_match_time: match.start_time * 1000,
+  };
 
-  const teams = await getTeams();
+  ///exception for Orange E-Sports
+  if (winner.team_id === 42) {
+    winner.team_id = 416900;
+  }
+  if (looser.team_id === 42) {
+    looser.team_id = 416900;
+  }
 
-  if (!teams.some((team) => team.team_id === winnerTeamId)) {
-    const winnerData = await getTeamData(winnerTeamId);
-    const winner = {
-      team_id: winnerTeamId,
-      name: winnerData?.name || winnerTeamId,
-      rating_place: teams.length + 1,
-      last_match_time: winnerData?.last_match_time || match.start_time,
-      tag: winnerData?.tag || winnerTeamId,
-      logo_url: winnerData?.logo_url || '',
-    };
+  const foundWinner = teams.find(({ team_id }) => team_id === winner.team_id);
+  const foundLooser = teams.find(({ team_id }) => team_id === looser.team_id);
+
+  if (foundWinner) {
+    winner.rating_place = foundWinner.rating_place;
+  } else {
+    winner.rating_place = teams.length + 1;
     teams.push(winner);
-    await upsertTeam(winner);
+    teamsToUpdate.push(winner);
   }
 
-  if (!teams.some((team) => team.team_id === looserTeamId)) {
-    const looserData = await getTeamData(looserTeamId);
-    const looser = {
-      team_id: looserTeamId,
-      name: looserData?.name || looserTeamId,
-      rating_place: teams.length + 1,
-      last_match_time: looserData?.last_match_time || match.start_time,
-      tag: looserData?.tag || looserTeamId,
-      logo_url: looserData?.logo_url || '',
-    };
+  if (foundLooser) {
+    looser.rating_place = foundLooser.rating_place;
+  } else {
+    looser.rating_place = teams.length + 1;
     teams.push(looser);
-    await upsertTeam(looser);
+    teamsToUpdate.push(looser);
   }
 
-  const winner = teams.find((team) => team.team_id === winnerTeamId);
-  const looser = teams.find((team) => team.team_id === looserTeamId);
-
-  const winnerRatingPlace = winner.rating_place;
-  const looserRatingPlace = looser.rating_place;
-
-  if (winnerRatingPlace > looserRatingPlace) {
+  if (winner.rating_place > looser.rating_place) {
     const fallingTeams = teams
-      .map((team) => {
-        return {
-          team_id: team.team_id,
-          rating_place: team.rating_place,
-        };
-      })
       .filter(
         (team) =>
-          team.rating_place < winnerRatingPlace &&
-          team.rating_place >= looserRatingPlace,
-      );
-
-    for (const fallingTeam of fallingTeams) {
-      await upsertTeam({
-        team_id: fallingTeam.team_id,
-        rating_place: fallingTeam.rating_place + 1,
+          team.rating_place < winner.rating_place &&
+          team.rating_place > looser.rating_place,
+      )
+      .map((team) => {
+        return {
+          ...team,
+          rating_place: team.rating_place + 1,
+        };
       });
-    }
 
-    await upsertTeam({
-      team_id: winnerTeamId,
-      rating_place: looserRatingPlace,
-    });
+    winner.rating_place = looser.rating_place;
+    winner.last_match_time = match.start_time * 1000;
+    teamsToUpdate.push(winner);
+
+    looser.rating_place = looser.rating_place + 1;
+    looser.last_match_time = match.start_time * 1000;
+    teamsToUpdate.push(looser);
+
+    teamsToUpdate.push(...fallingTeams);
   }
 
   const matchTime = new Date(match.start_time * 1000);
   console.log(
-    `${matchTime.toLocaleString('ru-RU')} ~ ${match.match_id}: ${winner?.name} > ${
-      looser?.name
+    `${matchTime.toLocaleString('ru-RU')} ~ ${match.match_id}: ${winner.name} > ${
+      looser.name
     }`,
   );
+
+  return teamsToUpdate;
 };
