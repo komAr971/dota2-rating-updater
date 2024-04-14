@@ -1,5 +1,3 @@
-import { addFirstPlace } from './dota2-rating.api';
-
 export default (match, teams) => {
   const result = {};
   const teamsToUpdate = [];
