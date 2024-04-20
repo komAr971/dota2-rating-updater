@@ -1,7 +1,7 @@
-export default (match, teams) => {
-  const result = {};
-  const teamsToUpdate = [];
+import exceptions from '../data/exceptions.js';
+import { addFirstPlace, addTeam, getTeam, updateTeam } from './dota2-rating.api.js';
 
+export default async (match) => {
   const winner = {
     team_id: match.radiant_win ? match.radiant_team_id : match.dire_team_id,
     name: match.radiant_win ? match.radiant_name : match.dire_name,
@@ -13,90 +13,44 @@ export default (match, teams) => {
     last_match_time: match.start_time * 1000,
   };
 
-  ///exception for Orange E-Sports
-  if (winner.team_id === 42) {
-    winner.team_id = 416900;
+  if (exceptions[winner.team_id]) {
+    winner.team_id = exceptions[winner.team_id];
   }
-  if (looser.team_id === 42) {
-    looser.team_id = 416900;
-  }
-
-  ///exception for Kaipi
-  if (winner.team_id === 1002030) {
-    winner.team_id = 59;
-  }
-  if (looser.team_id === 1002030) {
-    looser.team_id = 59;
+  if (exceptions[looser.team_id]) {
+    looser.team_id = exceptions[looser.team_id];
   }
 
-  ///exception for Team Empire
-  if (winner.team_id === 1110667) {
-    winner.team_id = 46;
-  }
-  if (looser.team_id === 1110667) {
-    looser.team_id = 46;
-  }
+  const foundWinner = await getTeam(winner.team_id);
+  const foundLooser = await getTeam(looser.team_id);
 
-  const foundWinner = teams.find(({ team_id }) => team_id === winner.team_id);
-  const foundLooser = teams.find(({ team_id }) => team_id === looser.team_id);
-
-  if (foundWinner) {
-    winner.rating_place = foundWinner.rating_place;
-  } else {
-    winner.rating_place = teams.length + 1;
-    teams.push(winner);
-    teamsToUpdate.push(winner);
+  if (!foundWinner && !foundLooser) {
+    await addTeam(winner);
+    await addTeam(looser);
+  } else if (!foundLooser) {
+    await addTeam(looser);
+  } else if (!foundWinner) {
+    winner.rating_place = foundLooser.rating_place;
+    await addTeam(winner);
+  } else if (foundWinner.rating_place > foundLooser.rating_place) {
+    winner.rating_place = foundLooser.rating_place;
+    await updateTeam(winner);
   }
 
-  if (foundLooser) {
-    looser.rating_place = foundLooser.rating_place;
-  } else {
-    looser.rating_place = teams.length + 1;
-    teams.push(looser);
-    teamsToUpdate.push(looser);
-  }
-
-  if (winner.rating_place > looser.rating_place) {
-    const fallingTeams = teams
-      .filter(
-        (team) =>
-          team.rating_place < winner.rating_place &&
-          team.rating_place > looser.rating_place,
-      )
-      .map((team) => {
-        return {
-          ...team,
-          rating_place: team.rating_place + 1,
-        };
-      });
-
-    winner.rating_place = looser.rating_place;
-    winner.last_match_time = match.start_time * 1000;
-    teamsToUpdate.push(winner);
-
-    if (winner.rating_place === 1) {
-      result.firstPlace = {
-        team_id: winner.team_id,
-        match_time: match.start_time * 1000,
-        league_id: match.leagueid,
-        league_name: match.league_name,
-      };
-    }
-
-    looser.rating_place = looser.rating_place + 1;
-    looser.last_match_time = match.start_time * 1000;
-    teamsToUpdate.push(looser);
-
-    teamsToUpdate.push(...fallingTeams);
+  if (winner.rating_place === 1 && foundLooser.rating_place === 1) {
+    const firstPlace = {
+      team_id: winner.team_id,
+      name: winner.name,
+      match_time: match.start_time * 1000,
+      league_id: match.leagueid,
+      league_name: match.league_name,
+    };
+    await addFirstPlace(firstPlace);
   }
 
   const matchTime = new Date(match.start_time * 1000);
   console.log(
-    `${matchTime.toLocaleString('ru-RU')} ~ ${match.match_id}: ${winner.name} > ${
-      looser.name
-    }`,
+    `${matchTime.toLocaleString('ru-RU')} ~ ${match.league_name} ~ ${
+      match.match_id
+    } ${winner.name} > ${looser.name} `,
   );
-
-  result.teamsToUpdate = teamsToUpdate;
-  return result;
 };

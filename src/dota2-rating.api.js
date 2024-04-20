@@ -24,14 +24,35 @@ const updateLastMatchEndTime = async (lastMatchEndTime) => {
 };
 
 const getTeams = async () => {
-  const url = new URL('http://localhost:3000/api/teams');
+  const url = new URL('http://localhost:3000/api/teams/');
 
   const response = await fetch(url.toString());
   return await response.json();
 };
 
-const upsertTeam = async (team) => {
-  const url = new URL('http://localhost:3000/api/teams/');
+const getTeam = async (team_id) => {
+  const url = new URL(team_id, 'http://localhost:3000/api/teams/');
+
+  const response = await fetch(url.toString());
+  return await response.json();
+};
+
+const addTeam = async (team) => {
+  const url = new URL('http://localhost:3000/api/teams');
+
+  const body = JSON.stringify(team);
+  const response = await fetch(url.toString(), {
+    method: 'POST',
+    body: body,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+  return await response.json();
+};
+
+const updateTeam = async (team) => {
+  const url = new URL(team.team_id, 'http://localhost:3000/api/teams/');
 
   const body = JSON.stringify(team);
   const response = await fetch(url.toString(), {
@@ -58,10 +79,27 @@ const addFirstPlace = async (firstPlace) => {
   return await response.json();
 };
 
+const deleteInactiveTeams = async (date) => {
+  const url = new URL('http://localhost:3000/api/teams/delete-inactive');
+
+  const body = JSON.stringify(date);
+  const response = await fetch(url.toString(), {
+    method: 'POST',
+    body: body,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+  return await response.json();
+};
+
 export {
   getLastMatchEndTime,
   updateLastMatchEndTime,
   getTeams,
-  upsertTeam,
+  getTeam,
+  addTeam,
+  updateTeam,
   addFirstPlace,
+  deleteInactiveTeams,
 };

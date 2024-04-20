@@ -12,7 +12,12 @@ const mapper = (match) => {
 };
 
 const filter = (match) => {
-  return match.radiant_team_id && match.dire_team_id;
+  return (
+    match.radiant_team_id &&
+    match.dire_team_id &&
+    match.radiant_name &&
+    match.dire_name
+  );
 };
 
 export default () => {
