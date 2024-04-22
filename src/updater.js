@@ -1,14 +1,19 @@
-import getLastMatches from './getLastMatches.js';
-import analyzeMatch from './analyzeMatch.js';
-import { addMatch } from './dota2-rating.api.js';
+import {
+  addMatch,
+  getLastAnalyzedDate,
+  getLastMatchEndTime,
+  getMatchesAfterDate,
+  getRating,
+  setNewTop1,
+  updateLastAnalyzedDate,
+  updateRating,
+  updateTeam,
+} from './api/dota2-rating.api.js';
 
 const updater = async () => {
-  const matches = await getLastMatches();
-
-  for (const match of matches) {
-    await addMatch(match);
-    await analyzeMatch(match);
-  }
+  const date = new Date(1271948591000);
+  const res = await getMatchesAfterDate(date);
+  console.log(res.slice(0, 5));
 };
 
 await updater();

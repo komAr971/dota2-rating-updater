@@ -1,5 +1,5 @@
-import { getProMatches } from './opendota.api.js';
-import { getLastMatchEndTime } from './dota2-rating.api.js';
+import { getProMatches } from './api/opendota.api.js';
+import { getLastMatchEndTime } from './api/dota2-rating.api.js';
 
 const compareMatches = (match1, match2) => {
   return match1.end_time - match2.end_time;

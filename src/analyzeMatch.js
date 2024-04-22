@@ -1,7 +1,15 @@
 import exceptions from '../data/exceptions.js';
-import { addFirstPlace, addTeam, getTeam, updateTeam } from './dota2-rating.api.js';
+import {
+  addFirstPlace,
+  addMatch,
+  addTeam,
+  getTeam,
+  updateTeam,
+} from './api/dota2-rating.api.js';
 
 export default async (match) => {
+  await addMatch(match);
+
   const winner = {
     team_id: match.winner_team_id,
     name: match.winner_name,
