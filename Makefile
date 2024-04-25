@@ -3,3 +3,9 @@ update:
 
 test:
 	npm run test
+
+updateMatches:
+	node src/updateMatches.js
+
+analyzeMatches: 
+	node src/analyzeMatches.js

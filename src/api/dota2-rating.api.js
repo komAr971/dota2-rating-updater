@@ -7,6 +7,13 @@ const getRating = async () => {
   return await response.json();
 };
 
+const getEnrichedRating = async () => {
+  const url = new URL('http://localhost:3000/api/rating/enriched');
+
+  const response = await fetch(url.toString());
+  return await response.json();
+};
+
 const updateRating = async (rating) => {
   const url = new URL('http://localhost:3000/api/rating');
 
@@ -108,6 +115,7 @@ const getMatchesAfterDate = async (date) => {
 
 export {
   getRating,
+  getEnrichedRating,
   updateRating,
   updateTeam,
   getLastAnalyzedDate,

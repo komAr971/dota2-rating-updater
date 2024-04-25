@@ -1,5 +1,5 @@
+import { addMatch, getLastMatchEndTime } from './api/dota2-rating.api.js';
 import { getProMatches } from './api/opendota.api.js';
-import { getLastMatchEndTime } from './api/dota2-rating.api.js';
 
 const compareMatches = (match1, match2) => {
   return match1.end_time - match2.end_time;
@@ -30,8 +30,8 @@ const filter = (match) => {
   );
 };
 
-export default async () => {
-  const lastMatchEndTime = new Date(await getLastMatchEndTime()).getTime();
+const getLastMatches = async () => {
+  const lastMatchEndTime = await getLastMatchEndTime();
 
   let sortedMatches = [];
   let lastMatchId = null;
@@ -39,10 +39,24 @@ export default async () => {
 
   do {
     matches = await getProMatches(lastMatchId);
-    const mappedMatches = matches.filter(filter).map(mapper);
     lastMatchId = matches[matches.length - 1].match_id;
+
+    const mappedMatches = matches.filter(filter).map(mapper);
     sortedMatches = [...sortedMatches, ...mappedMatches].sort(compareMatches);
   } while (sortedMatches[0].end_time > lastMatchEndTime);
 
   return sortedMatches.filter((match) => match.end_time > lastMatchEndTime);
 };
+
+const updateMatches = async () => {
+  const newMatches = await getLastMatches();
+  for (const match of newMatches) {
+    const { match_id, winner_name, looser_name } = await addMatch(match);
+    console.log(`add match_id: ${match_id} ~ ${winner_name} > ${looser_name}`);
+  }
+  console.log(`${newMatches.length} new matches added.`);
+};
+
+await updateMatches();
+
+export default updateMatches;
