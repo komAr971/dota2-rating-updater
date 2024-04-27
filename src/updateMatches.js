@@ -57,6 +57,4 @@ const updateMatches = async () => {
   console.log(`${newMatches.length} new matches added.`);
 };
 
-await updateMatches();
-
 export default updateMatches;

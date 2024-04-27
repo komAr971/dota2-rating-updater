@@ -1,12 +1,5 @@
 import fetch from 'node-fetch';
 
-const getRating = async () => {
-  const url = new URL('http://localhost:3000/api/rating');
-
-  const response = await fetch(url.toString());
-  return await response.json();
-};
-
 const getEnrichedRating = async () => {
   const url = new URL('http://localhost:3000/api/rating/enriched');
 
@@ -30,10 +23,10 @@ const updateRating = async (rating) => {
   return await response.json();
 };
 
-const updateTeam = async (team) => {
+const updateTeams = async (teams) => {
   const url = new URL('http://localhost:3000/api/teams/');
 
-  const body = JSON.stringify(team);
+  const body = JSON.stringify(teams);
   const response = await fetch(url.toString(), {
     method: 'POST',
     body: body,
@@ -68,12 +61,10 @@ const updateLastAnalyzedDate = async (date) => {
   return await response.json();
 };
 
-const setNewTop1 = async (match_id) => {
-  const url = new URL('http://localhost:3000/api/matches/set-new-top-1');
+const setNewTop1Bulk = async (matches) => {
+  const url = new URL('http://localhost:3000/api/matches/set-new-top-1-bulk');
 
-  const body = JSON.stringify({
-    match_id: match_id,
-  });
+  const body = JSON.stringify(matches);
   const response = await fetch(url.toString(), {
     method: 'POST',
     body: body,
@@ -114,13 +105,12 @@ const getMatchesAfterDate = async (date) => {
 };
 
 export {
-  getRating,
   getEnrichedRating,
   updateRating,
-  updateTeam,
+  updateTeams,
   getLastAnalyzedDate,
   updateLastAnalyzedDate,
-  setNewTop1,
+  setNewTop1Bulk,
   getLastMatchEndTime,
   addMatch,
   getMatchesAfterDate,
