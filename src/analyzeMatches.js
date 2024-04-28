@@ -9,7 +9,9 @@ import {
 } from './api/dota2-rating.api.js';
 
 const compareMatches = (match1, match2) => {
-  return match1.end_time - match2.end_time;
+  const match1EndTime = new Date(match1.end_time);
+  const match2EndTime = new Date(match2.end_time);
+  return match1EndTime - match2EndTime;
 };
 
 const analyzeMatches = async () => {
@@ -19,6 +21,7 @@ const analyzeMatches = async () => {
 
   console.log('getting matches');
   const matches = await getMatchesAfterDate(lastAnalyzedDate);
+  console.log('sorting matches');
   const sortedMatches = matches.sort(compareMatches);
   console.log(`matches count: ${sortedMatches.length}`);
 
