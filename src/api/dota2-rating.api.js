@@ -37,6 +37,15 @@ const updateTeams = async (teams) => {
   return await response.json();
 };
 
+const deleteTeams = async () => {
+  const url = new URL('http://localhost:3000/api/teams/');
+
+  const responce = await fetch(url.toString(), {
+    method: 'DELETE',
+  });
+  return await responce.json();
+};
+
 const getLastAnalyzedDate = async () => {
   const url = new URL('http://localhost:3000/api/last-analyzed-date/');
 
@@ -75,6 +84,15 @@ const setNewTop1Bulk = async (matches) => {
   return await response.json();
 };
 
+const unsetNewTop1 = async () => {
+  const url = new URL('http://localhost:3000/api/matches/unset-new-top-1');
+
+  const responce = await fetch(url.toString(), {
+    method: 'POST',
+  });
+  return await responce.json();
+};
+
 const getLastMatchEndTime = async () => {
   const url = new URL('http://localhost:3000/api/matches/last-end-time');
 
@@ -97,6 +115,15 @@ const addMatch = async (match) => {
   return await response.json();
 };
 
+const deleteInactiveMatches = async () => {
+  const url = new URL('http://localhost:3000/api/matches/inactive');
+
+  const responce = await fetch(url.toString(), {
+    method: 'DELETE',
+  });
+  return await responce.json();
+};
+
 const getMatchesAfterDate = async (date) => {
   const url = new URL(date.valueOf(), 'http://localhost:3000/api/matches/after/');
 
@@ -108,10 +135,13 @@ export {
   getEnrichedRating,
   updateRating,
   updateTeams,
+  deleteTeams,
   getLastAnalyzedDate,
   updateLastAnalyzedDate,
   setNewTop1Bulk,
+  unsetNewTop1,
   getLastMatchEndTime,
   addMatch,
+  deleteInactiveMatches,
   getMatchesAfterDate,
 };

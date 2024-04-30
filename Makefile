@@ -9,3 +9,6 @@ updateMatches:
 
 analyzeMatches: 
 	node src/analyzeMatches.js
+
+reset:
+	node src/resetRating.js

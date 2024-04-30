@@ -6,7 +6,9 @@ import {
   setNewTop1Bulk,
   updateRating,
   updateLastAnalyzedDate,
+  addMatch,
 } from './api/dota2-rating.api.js';
+import exceptions from '../data/exceptions.js';
 
 const compareMatches = (match1, match2) => {
   const match1EndTime = new Date(match1.end_time);
@@ -57,18 +59,34 @@ const analyzeMatches = async () => {
         const team_id = rating[i];
         const lastMatchEndTime = new Date(teams[team_id].last_match_time);
         if (lastMatchEndTime < sixMonthsAgo) {
+          if (i === 0) {
+            const matchEndTime = new Date(match.end_time);
+            matchEndTime.setHours(0, 0, 0, 0);
+            matchEndTime.set;
+            await addMatch({
+              match_id: -1,
+              end_time: matchEndTime,
+              winner_team_id: rating[1],
+              winner_name: teams[rating[1]].name,
+              looser_team_id: rating[0],
+              looser_name: teams[rating[0]].name,
+              league_id: 0,
+              league_name: `${teams[rating[0]].name} was inactive`,
+              new_top_1: true,
+            });
+          }
           rating.splice(i, 1);
         }
       }
     }
 
     const winner = {
-      team_id: match.winner_team_id,
+      team_id: exceptions[match.winner_team_id] || match.winner_team_id,
       name: match.winner_name,
       last_match_time: match.end_time,
     };
     const looser = {
-      team_id: match.looser_team_id,
+      team_id: exceptions[match.looser_team_id] || match.looser_team_id,
       name: match.looser_name,
       last_match_time: match.end_time,
     };
