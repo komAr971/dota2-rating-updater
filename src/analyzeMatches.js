@@ -47,6 +47,7 @@ const analyzeMatches = async () => {
   const top1Teams = [];
 
   let currentDay = new Date(sortedMatches[0].end_time).getDay();
+  let inactiveMatchId = 0;
 
   for (const match of sortedMatches) {
     const matchDay = new Date(match.end_time).getDay();
@@ -63,8 +64,9 @@ const analyzeMatches = async () => {
             const matchEndTime = new Date(match.end_time);
             matchEndTime.setHours(0, 0, 0, 0);
             matchEndTime.set;
+            inactiveMatchId -= 1;
             await addMatch({
-              match_id: -1,
+              match_id: inactiveMatchId,
               end_time: matchEndTime,
               winner_team_id: rating[1],
               winner_name: teams[rating[1]].name,
